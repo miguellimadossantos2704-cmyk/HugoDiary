@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seu Nome | Full Stack Developer</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* Palette: Deep Void x Neon Luxe */
+            --bg-deep: #050505;
+            /* Blackest black */
+            --bg-card: #0a0a0a;
+            /* Slightly lighter */
+            --bg-element: #111111;
+
+            --primary: #d4af37;
+            /* Metallic Gold */
+            --primary-glow: rgba(212, 175, 55, 0.4);
+
+            --secondary: #a855f7;
+            /* Electric Purple */
+            --accent: #10b981;
+            /* Emerald Success */
+
+            --text-main: #ffffff;
+            --text-muted: #a3a3a3;
+
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --glow-card: 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.03em;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+        }
+
+        /* --- LAYOUT --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        section {
+            padding: 140px 0;
+            /* More breathing room */
+            position: relative;
+        }
+
+        /* Tech Line Decor */
+        .tech-line {
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, var(--primary), transparent);
+            margin: 0 auto;
+            opacity: 0.5;
+        }
+
+        /* --- HERO --- */
+        .hero {
+            min-height: 90vh;
+            /* Focus on fold */
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            /* Left align for power */
+            background: radial-gradient(circle at 90% 10%, rgba(168, 85, 247, 0.15), transparent 50%);
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 99px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .hero h1 {
+            font-size: clamp(3.5rem, 6vw, 6rem);
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 32px;
+            letter-spacing: -2px;
+        }
+
+        .hero-highlight {
+            color: transparent;
+            -webkit-text-stroke: 1px var(--primary);
+            position: relative;
+        }
+
+        .hero-highlight::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 3px;
+            top: 3px;
+            color: var(--primary);
+            opacity: 0.7;
+            filter: blur(8px);
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            /* Larger for impact */
+            color: var(--text-muted);
+            max-width: 650px;
+            margin-bottom: 48px;
+            font-weight: 300;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--primary);
+            color: #000;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
+            margin-left: 16px;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* --- PROJECTS --- */
+        .section-header {
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            transition: 0.4s;
+            position: relative;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-img {
+            height: 240px;
+            background: var(--bg-element);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--text-muted);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-img::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, var(--bg-card), transparent);
+            opacity: 0.6;
+        }
+
+        .project-content {
+            padding: 32px;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .project-desc {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+        }
+
+        .project-link {
+            color: var(--primary);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* --- SKILLS --- */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid var(--border-subtle);
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .skill-card:hover {
+            background: var(--bg-element);
+            border-color: var(--primary);
+        }
+
+        .skill-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .skill-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .skill-level {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 60px 0;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <p
+                    style="color: var(--primary); font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px;">
+                    Full Stack Developer & Performance Engineer
+                </p>
+                <h1>
+                    Eu crio sistemas que <br>
+                    <span class="hero-highlight" data-text="funcionam de verdade.">funcionam de verdade.</span>
+                </h1>
+                <p>
+                    Transformo requisitos complexos em software escalável, seguro e de alta performance.
+                    Porque código não é sobre linhas, é sobre <strong>resultados de negócio</strong>.
+                </p>
+
+                <div style="margin-top: 40px;">
+                    <a href="#projects" class="btn">Ver Prova de Competência <span>↓</span></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TECH SEPARATOR -->
+    <div class="tech-line"></div>
+
+    <!-- PROJECTS -->
+    <section id="projects">
+        <div class="container">
+            <div class="section-header">
+                <h2>Engenharia Aplicada</h2>
+                <p>Soluções técnicas para problemas reais de performance e usabilidade.</p>
+            </div>
+
+            <div class="project-grid">
+
+                <!-- Project 1: Zenith -->
+                <article class="project-card">
+                    <div class="project-img">
+                        ⚡
+                    </div>
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="tag">Offline-First Architecture</span>
+                            <span class="tag">IndexedDB</span>
+                            <span class="tag">Vanilla JS</span>
+                        </div>
+                        <h3 class="project-title">Zenith App (PWA)</h3>
+                        <p class="project-desc">
+                            <strong>O Desafio:</strong> Criar um rastreador de biometria persistente sem backend,
+                            garantindo 100% de privacidade.<br>
+                            <strong>A Solução:</strong> Arquitetura "Local-First" utilizando IndexedDB para
+                            armazenamento complexo estruturado e Service Workers para funcionamento offline. Manipulação
+                            de DOM direta para < 50ms TTI. </p>
+                                <a href="index.html" target="_blank" class="project-link">Ver Aplicação Real →</a>
+                    </div>
+                </article>
+
+                <!-- Project 2: Dashboard -->
+                <article class="project-card">
+                    <div class="project-img">
+                        📊
+                    </div>
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="tag">Real-time Data</span>
+                            <span class="tag">D3.js Visualization</span>
+                            <span class="tag">WebSockets</span>
+                        </div>
+                        <h3 class="project-title">Financial Analytics Engine</h3>
+                        <p class="project-desc">
+                            <strong>O Desafio:</strong> Renderizar 50k+ pontos de dados financeiros sem travar a thread
+                            principal da UI.<br>
+                            <strong>A Solução:</strong> Utilização de Web Workers para processamento de dados em
+                            background e Canvas API para renderização gráfica de alta performance.
+                        </p>
+                        <a href="#" class="project-link" style="opacity: 0.5; cursor: not-allowed;">Código Privado</a>
+                    </div>
+                </article>
+
+                <!-- Project 3: API Gateway -->
+                <article class="project-card">
+                    <div class="project-img">
+                        🛡️
+                    </div>
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="tag">Node.js Stream API</span>
+                            <span class="tag">Redis Caching</span>
+                            <span class="tag">Rate Limiting</span>
+                        </div>
+                        <h3 class="project-title">High-Throughput Gateway</h3>
+                        <p class="project-desc">
+                            <strong>O Desafio:</strong> Gerenciar picos de 10k req/s protegendo microserviços
+                            downstream.<br>
+                            <strong>A Solução:</strong> Implementação de Rate Limiting com algoritmo Token Bucket
+                            distribuído via Redis e processamento assíncrono não-bloqueante.
+                        </p>
+                        <a href="#" class="project-link">Ver Arquitetura no GitHub →</a>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" style="background: var(--bg-card);">
+        <div class="container">
+            <div class="section-header" style="text-align: center; max-width: 600px; margin: 0 auto 60px;">
+                <h2>Arsenal Técnico</h2>
+                <p>Ferramentas e tecnologias que domino para entregar resultados excepcionais.</p>
+            </div>
+
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <span class="skill-icon">⚡</span>
+                    <div class="skill-name">Frontend</div>
+                    <div class="skill-level">HTML, CSS, React, Vue</div>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🛠️</span>
+                    <div class="skill-name">Backend</div>
+                    <div class="skill-level">Node.js, Python, SQL</div>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">📱</span>
+                    <div class="skill-name">Mobile</div>
+                    <div class="skill-level">React Native, PWA</div>
+                </div>
+                <div class="skill-card">
+                    <span class="skill-icon">🎨</span>
+                    <div class="skill-name">Design</div>
+                    <div class="skill-level">Figma, UI/UX, Motion</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 [Seu Nome]. Construído com paixão e código.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>
