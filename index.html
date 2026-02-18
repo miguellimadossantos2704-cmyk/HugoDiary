@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZENITH</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* HIGH PERFORMANCE THEME */
+            --bg-void: #0f0f0f;
+            --bg-card: #161616;
+            --bg-surface: #1e1e1e;
+
+            --primary: #ffffff;
+            --secondary: #9ca3af;
+
+            --accent: #4ade80;
+            /* Performance Green */
+            --accent-glow: rgba(74, 222, 128, 0.2);
+
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+
+            --border: #262626;
+            --border-hover: #404040;
+
+            --radius-md: 12px;
+            --radius-lg: 20px;
+
+            --font-main: 'Outfit', system-ui, sans-serif;
+            --font-display: 'Space Grotesk', monospace;
+
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+            --shadow-glow: 0 0 15px var(--accent-glow);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-main);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 90px;
+            /* Nav space */
+            overflow-x: hidden;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1,
+        h2,
+        h3 {
+            font-family: var(--font-display);
+            letter-spacing: -0.02em;
+        }
+
+        .section-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 32px 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-header::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 18px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        /* --- DASHBOARD LAYOUT --- */
+        .tab-content {
+            display: none;
+            padding: 24px;
+            max-width: 650px;
+            margin: 0 auto;
+            width: 100%;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- CARDS --- */
+        .dashboard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-card);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .dashboard-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        /* --- ROUTINE TIMELINE --- */
+        .timeline-container {
+            position: relative;
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 29px;
+            top: 15px;
+            bottom: 0;
+            width: 2px;
+            background: #222;
+            z-index: 0;
+            border-radius: 2px;
+        }
+
+        .routine-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-marker {
+            width: 14px;
+            height: 14px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            margin-top: 18px;
+            flex-shrink: 0;
+            transition: 0.3s;
+            box-shadow: 0 0 0 4px var(--bg-void);
+            /* Spacer */
+        }
+
+        .routine-item.active .timeline-marker {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px var(--bg-void), var(--shadow-glow);
+        }
+
+        .routine-item.completed .timeline-marker {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .task-card {
+            flex-grow: 1;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .task-card:active {
+            transform: scale(0.98);
+        }
+
+        /* Active State */
+        .routine-item.active .task-card {
+            background: linear-gradient(135deg, var(--bg-surface) 0%, #202622 100%);
+            border-color: var(--accent);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .routine-item.completed .task-card {
+            opacity: 0.6;
+            filter: grayscale(0.5);
+        }
+
+        .task-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-desc {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .task-check {
+            color: var(--accent);
+            opacity: 0;
+            transition: 0.2s;
+            transform: scale(0.5);
+        }
+
+        .routine-item.completed .task-check {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .study-block {
+            border-left: 3px solid #818cf8;
+        }
+
+        /* --- INPUTS & FORMS --- */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        input[type="time"],
+        input[type="number"],
+        select {
+            width: 100%;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            padding: 14px;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-action {
+            width: 100%;
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-action:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+
+        /* --- METRICS & GAUGE --- */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-val {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 4px 0;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--secondary);
+            text-transform: uppercase;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #262626;
+            border-radius: 99px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Gauge SVG */
+        .gauge-container {
+            width: 220px;
+            height: 110px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .gauge-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .gauge-value {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 2.2rem;
+            line-height: 1;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: var(--font-display);
+            z-index: 10;
+        }
+
+        .gauge-label {
+            position: absolute;
+            bottom: -20px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            text-transform: uppercase;
+        }
+
+        .gauge-bg-stroke {
+            stroke: #262626;
+        }
+
+        .gauge-fill-stroke {
+            stroke: var(--accent);
+            transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s;
+        }
+
+        /* --- TABLES --- */
+        .table-wrapper {
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #111;
+            color: var(--secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-family: var(--font-main);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .quality-badge {
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .q-high {
+            background: rgba(16, 185, 129, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .q-mid {
+            background: rgba(245, 158, 11, 0.1);
+            color: #facc15;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .q-low {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* --- NAV BAR --- */
+        .nav-bar {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 420px;
+            height: 72px;
+            background: rgba(22, 22, 22, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            z-index: 100;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.8);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #525252;
+            transition: 0.3s;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .nav-icon {
+            font-size: 1.4rem;
+            filter: drop-shadow(0 0 0 transparent);
+            transition: 0.3s;
+        }
+
+        .nav-item.active .nav-icon {
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+
+        .nav-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- HEADER --- */
+        header {
+            padding: 30px 24px;
+            text-align: left;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            letter-spacing: -0.05em;
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        /* --- HYGIENE --- */
+        .hygiene-item {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 16px;
+            margin-bottom: 8px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: 0.2s;
+        }
+
+        .hygiene-item:hover {
+            border-color: var(--border-hover);
+        }
+
+        .hygiene-item.checked {
+            border-color: var(--accent);
+            background: rgba(74, 222, 128, 0.05);
+        }
+
+        .checkbox-custom {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #525252;
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            transition: 0.2s;
+        }
+
+        .hygiene-item.checked .checkbox-custom {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">ZENITH <span>PRO</span></div>
+    </header>
+
+    <!-- TAB: ROUTINE -->
+    <div id="tab-routine" class="tab-content active">
+        <!-- Items inserted by JS -->
+        <div class="timeline-container" id="timeline"></div>
+    </div>
+
+    <!-- TAB: SLEEP (BIO & TRACKING) -->
+    <div id="tab-sleep" class="tab-content">
+
+        <!-- METRICS GRID -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Meta Mensal</div>
+                <div class="metric-val" id="monthTotal">0 / 2400</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="monthBar"></div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Passos</div>
+                <div class="metric-val" id="monthStepsTotal">0</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="monthStepsBar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLEEP DASHBOARD CARD -->
+        <div class="dashboard-card">
+            <div class="section-header">Monitoramento de Sono</div>
+            <div class="gauge-container">
+                <svg class="gauge-svg" viewBox="0 0 200 100">
+                    <!-- Background Arc: M startX startY A rx ry x-axis-rotation large-arc-flag sweep-flag endX endY -->
+                    <!-- Center 100,100. Radius 80. Start 20,100. End 180,100. -->
+                    <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke-width="20" stroke-linecap="round"
+                        class="gauge-bg-stroke" />
+                    <path id="gaugePath" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke-width="20"
+                        stroke-linecap="round" class="gauge-fill-stroke" stroke-dasharray="251.2"
+                        stroke-dashoffset="251.2" />
+                </svg>
+                <div class="gauge-value" id="gaugeText">0</div>
+                <div class="gauge-label">Pontuação</div>
+            </div>
+
+            <div class="section-header">Registro Diário</div>
+
+            <!-- STEPS INPUT -->
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>Passos do Dia</label>
+                <input type="number" id="dailySteps" placeholder="Ex: 8000">
+            </div>
+
+            <!-- SLEEP TIME INPUTS -->
+            <div class="input-grid">
+                <div class="form-group">
+                    <label>Deitou</label>
+                    <input type="time" id="sleepStart">
+                </div>
+                <div class="form-group">
+                    <label>Acordou</label>
+                    <input type="time" id="sleepEnd">
+                </div>
+            </div>
+
+            <!-- SCORE INPUT -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label>Pontuação Sono (0-100)</label>
+                <input type="number" id="sleepScore" min="0" max="100" placeholder="Ex: 85"
+                    oninput="zenith.updateGauge(this.value)">
+            </div>
+
+        </div>
+
+        <!-- HYGIENE CARD -->
+        <div class="dashboard-card">
+            <div class="section-header">Higiene do Sono</div>
+            <div class="hygiene-list" id="hygieneList">
+                <!-- Generate via JS -->
+            </div>
+
+            <button class="btn-action" onclick="zenith.saveSleepLog()">SALVAR REGISTRO</button>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="section-header">Histórico (Últimos 7 dias)</div>
+            <div class="table-wrapper">
+                <table id="sleepTable">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Sono</th>
+                            <th>Passos</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- JS Populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: WORKOUT (Basic placeholder for structure compliance) -->
+    <div id="tab-workout" class="tab-content">
+        <div style="height: calc(100vh - 160px); display: flex; flex-direction: column;">
+            <div class="section-header">TITAN TRAINER</div>
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">
+                Acesse seu sistema de treino completo aqui:
+            </p>
+            <iframe src="https://miguellimadossantos2704-cmyk.github.io/TITANTREINERV39/app.html"
+                style="flex-grow: 1; width: 100%; border: 1px solid var(--border); border-radius: 12px; background: #121212;">
+            </iframe>
+            <a href="https://miguellimadossantos2704-cmyk.github.io/TITANTREINERV39/app.html" target="_blank"
+                class="btn-action" style="text-decoration: none; display: block; text-align: center; margin-top: 10px;">
+                EXPANDIR TREINO ↗
+            </a>
+        </div>
+    </div>
+
+
+
+    <!-- TAB: RUNNING -->
+    <div id="tab-running" class="tab-content">
+        <div class="dashboard-card">
+            <div class="section-header">Registro de Corrida</div>
+            <div class="input-grid">
+                <div class="form-group">
+                    <label>Distância (km)</label>
+                    <input type="number" id="runDistance" step="0.01" placeholder="Ex: 5.0">
+                </div>
+                <div class="form-group">
+                    <label>Tempo (min)</label>
+                    <input type="number" id="runDuration" step="1" placeholder="Ex: 30">
+                </div>
+            </div>
+            <button class="btn-action" onclick="zenith.saveRunningLog()">SALVAR CORRIDA</button>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="section-header">Histórico de Corridas</div>
+            <div class="table-wrapper">
+                <table id="runningTable">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Distância</th>
+                            <th>Tempo</th>
+                            <th>Pace</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- JS Populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: ANALYTICS -->
+    <div id="tab-analytics" class="tab-content">
+        <div class="section-header">Performance Semanal</div>
+
+        <div class="metrics-grid">
+            <div class="dashboard-card" style="padding: 15px;">
+                <canvas id="chartSteps"></canvas>
+            </div>
+            <div class="dashboard-card" style="padding: 15px;">
+                <canvas id="chartWater"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-card" style="padding: 15px;">
+            <canvas id="chartRoutine"></canvas>
+        </div>
+
+        <div class="dashboard-card" style="padding: 15px;">
+            <canvas id="chartRunning"></canvas>
+        </div>
+
+        <div class="dashboard-card" style="text-align: center; margin-top: 20px;">
+            <div class="section-header" style="justify-content: center;">Consistência Total</div>
+            <div style="padding: 20px 0;">
+                <h2 id="streakCount" style="font-size: 4rem; color: var(--accent); line-height: 1;">0</h2>
+                <p style="color: var(--secondary); font-size: 0.8rem; text-transform: uppercase;">Dias Seguidos</p>
+            </div>
+        </div>
+
+        <div class="dashboard-card" style="border-color: rgba(239, 68, 68, 0.3); margin-top: 20px;">
+            <div class="section-header" style="color: var(--danger); font-size: 0.9rem;">Zona de Perigo</div>
+            <button class="btn-action"
+                style="background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); margin-top: 10px; padding: 12px;"
+                onclick="zenith.hardReset()">
+                RESETAR SISTEMA
+            </button>
+        </div>
+    </div>
+
+    <!-- TAB: GYM (KPI) -->
+    <div id="tab-gym" class="tab-content">
+        <div class="dashboard-card" style="text-align: center; padding: 30px;">
+            <div id="gymMonthHeader" class="section-header" style="justify-content: center; margin-bottom: 20px;">Meta
+                Mensal (22 Dias)
+            </div>
+            <div style="width: 200px; height: 200px; margin: 0 auto; position: relative;">
+                <canvas id="chartGym"></canvas>
+                <div
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                    <div id="gymCount"
+                        style="font-size: 2.5rem; font-weight: 700; color: var(--accent); line-height: 1;">0</div>
+                    <div style="font-size: 0.8rem; color: var(--secondary); text-transform: uppercase;">Treinos</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card" style="text-align: center; padding: 30px;">
+            <div id="gymStatus" style="color: var(--secondary); margin-bottom: 15px;">Status: Não registrado</div>
+            <button id="btnGym" class="btn-action" onclick="zenith.toggleGym()"
+                style="height: 80px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span>💪</span> REGISTRAR TREINO
+            </button>
+        </div>
+
+        <div class="dashboard-card"
+            style="height: 600px; padding: 0; overflow: hidden; display: flex; flex-direction: column; margin-top: 20px;">
+            <div class="section-header" style="margin: 15px 20px;">TITAN TRAINER V39</div>
+            <iframe src="https://miguellimadossantos2704-cmyk.github.io/TITANTREINERV39/app.html"
+                style="flex-grow: 1; width: 100%; border: none; background: #121212;">
+            </iframe>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="zenith.nav('routine', this)">
+            <span class="nav-icon">⚡</span>
+            <span class="nav-label">ROTINA</span>
+        </div>
+        <div class="nav-item" onclick="zenith.nav('sleep', this)">
+            <span class="nav-icon">💤</span>
+            <span class="nav-label">SONO</span>
+        </div>
+        <!-- GYM TAB INSERTED -->
+        <div class="nav-item" onclick="zenith.nav('gym', this)">
+            <span class="nav-icon">🏋️</span>
+            <span class="nav-label">ACADEMIA</span>
+        </div>
+        <div class="nav-item" onclick="zenith.nav('running', this)">
+            <span class="nav-icon">🏃</span>
+            <span class="nav-label">CORRIDA</span>
+        </div>
+        <div class="nav-item" onclick="zenith.nav('analytics', this)">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">DADOS</span>
+        </div>
+    </nav>
+
+    <script>
+        const zenith = (() => {
+            const DB_KEY = 'zenith_v6_data';
+            const HYGIENE_ITEMS = [
+                "Sem telas (30min antes)",
+                "Ambiente escuro",
+                "Leitura leve",
+                "Não comer tarde"
+            ];
+
+            // Strict Routine
+            const ROUTINE_TEMPLATE = [
+                { time: "07:00", title: "Liturgia Diária", desc: "Leitura e reflexão." },
+                { time: "07:01", title: "Oração Matinal", desc: "Primeira conexão do dia." },
+                { time: "07:25", title: "Café da Manhã", desc: "Nutrição essencial." },
+                { time: "07:45", title: "Estudos da Faculdade", desc: "Foco total na graduação.", type: "STUDY" },
+                { time: "08:30", title: "ACADEMIA", desc: "Treino físico.", type: "WORKOUT" },
+                { time: "10:00", title: "Pós-Treino / Banho", desc: "Recuperação." },
+                { time: "10:30", title: "Curso de Tecnologia", desc: "Evolução profissional.", type: "STUDY" },
+                { time: "12:00", title: "Almoço", desc: "Refeição principal." },
+                { time: "14:00", title: "Curso de Xadrez", desc: "Desenvolvimento estratégico.", type: "STUDY" },
+                { time: "17:00", title: "Correr", desc: "Cardio e resistência." },
+                { time: "18:00", title: "Jantar Leve", desc: "Preparação noturna." },
+                { time: "20:00", title: "Meta de Passos (8000)", desc: "Checklist de movimento." },
+                { time: "21:00", title: "Meta de Água (3L)", desc: "Checklist de hidratação." },
+                { time: "21:30", title: "Oração da Noite", desc: "Conexão e gratidão." },
+                { time: "22:00", title: "Dormir", desc: "Recuperação total." }
+            ];
+
+            let state = {
+                history: {}, // Key: "YYYY-MM-DD" -> { tasks: [], sleep: {} }
+                today: new Date().toISOString().split('T')[0]
+            };
+
+            // --- DATABASE HELPER ---
+            const ZenithDB = {
+                dbName: 'ZenithDB',
+                storeName: 'days',
+                version: 1,
+                db: null,
+
+                async open() {
+                    return new Promise((resolve, reject) => {
+                        const request = indexedDB.open(this.dbName, this.version);
+
+                        request.onupgradeneeded = (event) => {
+                            const db = event.target.result;
+                            if (!db.objectStoreNames.contains(this.storeName)) {
+                                db.createObjectStore(this.storeName, { keyPath: 'date' });
+                            }
+                        };
+
+                        request.onsuccess = (event) => {
+                            this.db = event.target.result;
+                            resolve(this.db);
+                        };
+
+                        request.onerror = (event) => {
+                            console.error("DB Error", event);
+                            reject(event);
+                        };
+                    });
+                },
+
+                async put(data) {
+                    return new Promise((resolve, reject) => {
+                        const tx = this.db.transaction(this.storeName, 'readwrite');
+                        const store = tx.objectStore(this.storeName);
+                        const req = store.put(data);
+                        req.onsuccess = () => resolve(true);
+                        req.onerror = () => reject(false);
+                    });
+                },
+
+                async getAll() {
+                    return new Promise((resolve, reject) => {
+                        const tx = this.db.transaction(this.storeName, 'readonly');
+                        const store = tx.objectStore(this.storeName);
+                        const req = store.getAll();
+                        req.onsuccess = () => resolve(req.result);
+                        req.onerror = () => reject([]);
+                    });
+                },
+
+                async clear() {
+                    return new Promise((resolve, reject) => {
+                        if (!this.db) {
+                            // If DB not initialized, try to open it or just skipping might be risky if we want to ensure clear
+                            // But usually it is initialized by init()
+                            resolve(true);
+                            return;
+                        }
+                        const tx = this.db.transaction(this.storeName, 'readwrite');
+                        const store = tx.objectStore(this.storeName);
+                        const req = store.clear();
+                        req.onsuccess = () => resolve(true);
+                        req.onerror = () => reject(false);
+                    });
+                }
+            };
+
+            async function init() {
+                try {
+                    await ZenithDB.open();
+                    await loadState(); // Now async
+                } catch (e) {
+                    console.error("Init DB failed", e);
+                    // Fallback or alert? Content might just be empty.
+                }
+
+                // Initial UI Render (might be empty if loadState awaiting)
+                // But since we await loadState, data should be ready.
+                renderRoutine();
+                renderHygieneList();
+                renderSleepHistory();
+                renderRunningHistory();
+                updateStreak();
+                updateMonthlyTarget();
+                updateMonthlySteps();
+                loadDailyInputs();
+            }
+
+            function getTodayDate() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            async function loadState() {
+                // 1. Try Load from DB
+                const allData = await ZenithDB.getAll();
+
+                // 2. If DB empty, check LocalStorage (Migration)
+                if (allData.length === 0) {
+                    const raw = localStorage.getItem(DB_KEY);
+                    if (raw) {
+                        const legacyState = JSON.parse(raw);
+                        // Migrate history to DB
+                        const dates = Object.keys(legacyState.history);
+                        for (const date of dates) {
+                            const dayRecord = legacyState.history[date];
+                            dayRecord.date = date; // Ensure key
+                            await ZenithDB.put(dayRecord);
+                        }
+                        // Helper to populate state from legacy
+                        state.history = legacyState.history;
+                        console.log("Migration Complete");
+                    }
+                } else {
+                    // Populate state.history from DB data
+                    state.history = {};
+                    allData.forEach(day => {
+                        state.history[day.date] = day;
+                    });
+                }
+
+                // ALWAYS update to current LOCAL date
+                state.today = getTodayDate();
+
+                // Ensure today exists in history
+                if (!state.history[state.today]) {
+                    state.history[state.today] = { date: state.today, tasks: [], sleep: null, logs: [], runs: [] };
+                    // We don't save immediately, wait for user action
+                }
+            }
+
+            function saveState(dateToSave = null) {
+                // If date provided, save that specific day
+                const targetDate = dateToSave || state.today;
+                const dayData = state.history[targetDate];
+                if (dayData) {
+                    dayData.date = targetDate; // Ensure key
+                    ZenithDB.put(dayData).then(() => {
+                        console.log(`Saved ${targetDate} to DB`);
+                    });
+                }
+
+                // Update UI aggregates (global stats)
+                updateStreak();
+                updateMonthlyTarget();
+            }
+
+            // --- DELETION HELPERS ---
+            function deleteSleepLog(date, index) {
+                if (!confirm("Excluir este registro de sono?")) return;
+
+                const dayData = state.history[date];
+                if (!dayData) return;
+
+                // Handle legacy 'sleep' or 'logs' array
+                if (dayData.logs) {
+                    dayData.logs.splice(index, 1);
+                } else if (dayData.sleep && index === 0) {
+                    delete dayData.sleep;
+                }
+
+                saveState(date);
+                renderSleepHistory();
+                updateMonthlyTarget();
+                updateMonthlySteps();
+                loadDailyInputs();
+            }
+
+            function deleteRunLog(date, index) {
+                if (!confirm("Excluir esta corrida?")) return;
+
+                const dayData = state.history[date];
+                if (dayData && dayData.runs) {
+                    dayData.runs.splice(index, 1);
+                    saveState(date);
+                    renderRunningHistory();
+                }
+            }
+
+            // --- NAVIGATION ---
+            function nav(tabId, el) {
+                document.querySelectorAll('.tab-content').forEach(d => d.classList.remove('active'));
+                document.getElementById('tab-' + tabId).classList.add('active');
+
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+
+                if (tabId === 'analytics') {
+                    renderAnalytics();
+                }
+
+                if (tabId === 'gym') {
+                    renderGymStats();
+                }
+            }
+
+            // --- GYM LOGIC ---
+            function toggleGym() {
+                const day = state.history[state.today];
+                day.gym = !day.gym; // Toggle boolean
+                saveState();
+                loadDailyInputs(); // Update styling
+                renderGymStats(); // Update chart
+            }
+
+            function renderGymStats() {
+                const ctx = document.getElementById('chartGym');
+                const countElem = document.getElementById('gymCount');
+
+                // Count Gym days in current month
+                let count = 0;
+                const now = new Date();
+                const m = now.getMonth();
+                const y = now.getFullYear();
+
+                // Update Header
+                const monthName = now.toLocaleString('pt-BR', { month: 'long' });
+                const capMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                const header = document.getElementById('gymMonthHeader');
+                if (header) header.innerText = `Meta ${capMonth} (22 Dias)`;
+
+                Object.keys(state.history).forEach(date => {
+                    const d = new Date(date);
+                    if (d.getMonth() === m && d.getFullYear() === y) {
+                        if (state.history[date].gym) count++;
+                    }
+                });
+
+                countElem.innerText = count + " / 22";
+
+                // Update Chart
+                const goal = 22;
+                const remaining = Math.max(0, goal - count);
+                const achieved = Math.min(count, goal); // Cap for visual if over? Or let it loop? Standard doughnut usually 100%.
+
+                if (chartsInstance['gym']) chartsInstance['gym'].destroy();
+
+                chartsInstance['gym'] = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Concluídos', 'Restantes'],
+                        datasets: [{
+                            data: [achieved, remaining],
+                            backgroundColor: ['#4ade80', '#262626'],
+                            borderWidth: 0,
+                            cutout: '85%'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false }
+                        },
+                        animation: {
+                            animateScale: true,
+                            animateRotate: true
+                        }
+                    }
+                });
+            }
+
+            // --- ROUTINE ---
+            function renderRoutine() {
+                const container = document.getElementById('timeline');
+                container.innerHTML = '<div class="timeline-line"></div>';
+
+                const todayTasks = state.history[state.today].tasks || [];
+
+                // Check active based on time
+                const now = new Date();
+                const currentMins = now.getHours() * 60 + now.getMinutes();
+
+                ROUTINE_TEMPLATE.forEach((item, idx) => {
+                    const isDone = todayTasks.includes(idx);
+                    const [h, m] = item.time.split(':').map(Number);
+                    const itemMins = h * 60 + m;
+
+                    // Simple logic: Active if consistent with time and not done
+                    // or if it's the next pending task
+                    let isActive = false;
+                    if (!isDone && Math.abs(currentMins - itemMins) < 60) isActive = true;
+
+                    const div = document.createElement('div');
+                    div.className = `routine-item ${isDone ? 'completed' : ''} ${isActive ? 'active' : ''}`;
+                    div.onclick = () => toggleTask(idx);
+
+                    div.innerHTML = `
+
+                    <div class="timeline-marker"></div>
+                    <div class="task-card ${item.type === 'STUDY' ? 'study-block' : ''}">
+                        <div class="task-title">
+                            ${item.title}
+                            <span class="task-check">✓</span>
+                        </div>
+                        <div class="task-desc">${item.desc}</div>
+                    </div>
+                `;
+                    container.appendChild(div);
+                });
+            }
+
+            function toggleTask(idx) {
+                const tasks = state.history[state.today].tasks;
+                const pos = tasks.indexOf(idx);
+
+                if (pos === -1) tasks.push(idx);
+                else tasks.splice(pos, 1);
+
+                saveState();
+                renderRoutine();
+            }
+
+            // --- SLEEP & BIO ---
+            function updateGauge(val) {
+                const path = document.getElementById('gaugePath');
+                const text = document.getElementById('gaugeText');
+
+                // Clamp 0-100
+                val = Math.max(0, Math.min(100, val || 0));
+                text.innerText = val;
+
+                // SVG Logic
+                // Arc Length for r=80 is PI*80 = 251.327
+                const maxLen = 251.2;
+                const offset = maxLen - (val / 100) * maxLen;
+
+                path.style.strokeDashoffset = offset;
+
+                // Color Logic
+                let color = '#ef4444'; // Red
+                if (val >= 60) color = '#f59e0b'; // Yellow
+                if (val >= 80) color = '#10b981'; // Green
+
+                path.style.stroke = color;
+            }
+
+            function renderHygieneList() {
+                const container = document.getElementById('hygieneList');
+                container.innerHTML = '';
+
+                HYGIENE_ITEMS.forEach((text, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'hygiene-item';
+                    div.onclick = function () {
+                        this.classList.toggle('checked');
+                    };
+                    div.innerHTML = `
+                    <div class="checkbox-custom">✓</div>
+                    <div class="hygiene-text">${text}</div>
+                `;
+                    container.appendChild(div);
+                });
+            }
+
+            function saveSleepLog() {
+                const start = document.getElementById('sleepStart').value;
+                const end = document.getElementById('sleepEnd').value;
+                const scoreInput = parseInt(document.getElementById('sleepScore').value || 0);
+                const stepsInput = parseInt(document.getElementById('dailySteps').value || 0);
+
+                // Collect hygiene checks
+                const hygieneChecks = [];
+                document.querySelectorAll('.hygiene-item').forEach((el, idx) => {
+                    if (el.classList.contains('checked')) hygieneChecks.push(HYGIENE_ITEMS[idx]);
+                });
+
+                // Calc duration if times provided
+                let hours = 0;
+
+                if (start && end) {
+                    let sDate = new Date(`2000-01-01T${start}`);
+                    let eDate = new Date(`2000-01-01T${end}`);
+                    if (eDate < sDate) eDate.setDate(eDate.getDate() + 1);
+                    hours = parseFloat(((eDate - sDate) / 1000 / 60 / 60).toFixed(1));
+                }
+
+                // Create Valid Log Entry
+                // Only create if there's actual data
+                if (!scoreInput && !stepsInput && !hours) {
+                    alert("Insira pelo menos Passos, Score ou Horário.");
+                    return;
+                }
+
+                const newLog = {
+                    time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                    start, end, hours, score: scoreInput, steps: stepsInput, hygiene: hygieneChecks
+                };
+
+                // Initialize array if needed
+                if (!state.history[state.today].logs) {
+                    state.history[state.today].logs = [];
+                }
+
+                // Add new log
+                state.history[state.today].logs.push(newLog);
+
+                // Clear legacy 'sleep' object to avoid confusion if it exists
+                if (state.history[state.today].sleep) delete state.history[state.today].sleep;
+
+                saveState();
+                renderSleepHistory();
+                updateMonthlyTarget();
+                updateMonthlySteps();
+                loadDailyInputs(); // Refresh displays
+
+                // Clear inputs
+                document.getElementById('sleepStart').value = '';
+                document.getElementById('sleepEnd').value = '';
+                document.getElementById('sleepScore').value = '';
+                document.getElementById('dailySteps').value = '';
+                document.querySelectorAll('.hygiene-item').forEach(el => el.classList.remove('checked'));
+
+                alert(`Registro adicionado!`);
+            }
+
+            function renderSleepHistory() {
+                const tbody = document.querySelector('#sleepTable tbody');
+                tbody.innerHTML = '';
+
+                // Get last 7 days keys sorted reverse
+                const dates = Object.keys(state.history).sort().reverse().slice(0, 7);
+
+                dates.forEach(date => {
+                    const dayData = state.history[date];
+                    if (!dayData) return;
+
+                    // Handle Legacy (single object) vs New (Array)
+                    let logs = dayData.logs || [];
+                    if (dayData.sleep && logs.length === 0) logs = [dayData.sleep]; // migration view
+
+                    // Render each log
+                    // Reverse logs to show newest first? Or chrono? Let's do chrono (as is in array)
+                    // Actually, table usually shows newest on top. Let's reverse for display.
+                    // We need original index for deletion, so map first
+                    logs.map((log, i) => ({ ...log, originalIndex: i })).reverse().forEach(log => {
+                        let qClass = 'q-low';
+                        if (log.score >= 80) qClass = 'q-high';
+                        else if (log.score >= 60) qClass = 'q-mid';
+
+                        const tr = document.createElement('tr');
+                        // Format date DD/MM
+                        const [y, m, d] = date.split('-');
+
+                        tr.innerHTML = `
+                        <td>${d}/${m} <span style="font-size:0.7em; color:#666">${log.time || ''}</span></td>
+                        <td>${log.hours || 0}h</td>
+                        <td>${log.steps || '-'}</td>
+                        <td>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span class="quality-badge ${qClass}">${log.score || 0}</span>
+                                <button onclick="zenith.deleteSleepLog('${date}', ${log.originalIndex})" style="background:none; border:none; color:#666; cursor:pointer;">×</button>
+                            </div>
+                        </td>
+                    `;
+                        tbody.appendChild(tr);
+                    });
+                });
+            }
+
+            // --- ANALYTICS ---
+            function updateMonthlyTarget() {
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+
+                let totalScore = 0;
+
+                Object.keys(state.history).forEach(date => {
+                    const d = new Date(date);
+                    if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+                        const dayData = state.history[date];
+                        const logs = dayData.logs || (dayData.sleep ? [dayData.sleep] : []);
+
+                        logs.forEach(l => {
+                            totalScore += parseInt(l.score || 0);
+                        });
+                    }
+                });
+
+                document.getElementById('monthTotal').innerText = `${totalScore} / 2400`;
+                const pct = Math.min((totalScore / 2400) * 100, 100);
+                document.getElementById('monthBar').style.width = `${pct}%`;
+            }
+
+            function updateMonthlySteps() {
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                let totalSteps = 0;
+
+                Object.keys(state.history).forEach(date => {
+                    const d = new Date(date);
+                    if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+                        const dayData = state.history[date];
+                        const logs = dayData.logs || (dayData.sleep ? [dayData.sleep] : []);
+
+                        logs.forEach(l => {
+                            totalSteps += parseInt(l.steps || 0);
+                        });
+                    }
+                });
+
+                document.getElementById('monthStepsTotal').innerText = `${totalSteps} / 240000`;
+                const pct = Math.min((totalSteps / 240000) * 100, 100);
+                document.getElementById('monthStepsBar').style.width = `${pct}%`;
+            }
+
+            function updateStreak() {
+                const days = Object.keys(state.history).length;
+                document.getElementById('streakCount').innerText = days;
+            }
+
+            function loadDailyInputs() {
+                const todayData = state.history[state.today];
+                if (!todayData) return;
+
+                const logs = todayData.logs || (todayData.sleep ? [todayData.sleep] : []);
+
+                // Calculate Sums for Today for displaying in Gauge
+                let sumScore = 0;
+                let sumSteps = 0; // Not used in inputs but maybe good to know
+
+                logs.forEach(l => {
+                    sumScore += (parseInt(l.score) || 0);
+                    sumSteps += (parseInt(l.steps) || 0);
+                });
+
+                updateGauge(sumScore); // Show accumulated score
+
+                // Update Gym Button Style
+                const btnGym = document.getElementById('btnGym');
+                if (btnGym) {
+                    if (todayData.gym) {
+                        btnGym.style.backgroundColor = 'var(--accent)';
+                        btnGym.style.color = '#000';
+                        btnGym.innerHTML = '<span>✅</span> TREINO REGISTRADO';
+                        document.getElementById('gymStatus').innerText = 'Status: Concluído';
+                        document.getElementById('gymStatus').style.color = 'var(--accent)';
+                    } else {
+                        btnGym.style.backgroundColor = 'var(--primary)';
+                        btnGym.style.color = '#000';
+                        btnGym.innerHTML = '<span>💪</span> REGISTRAR TREINO';
+                        document.getElementById('gymStatus').innerText = 'Status: Não registrado';
+                        document.getElementById('gymStatus').style.color = 'var(--secondary)';
+                    }
+                }
+            }
+
+            // --- RUNNING ---
+            function saveRunningLog() {
+                const distance = parseFloat(document.getElementById('runDistance').value);
+                const duration = parseFloat(document.getElementById('runDuration').value);
+
+                if (!distance || !duration) {
+                    alert("Preencha distância e tempo.");
+                    return;
+                }
+
+                const newRun = {
+                    time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                    distance,
+                    duration
+                };
+
+                // Initialize array if needed
+                if (!state.history[state.today].runs) {
+                    state.history[state.today].runs = [];
+                }
+
+                state.history[state.today].runs.push(newRun);
+                saveState();
+                renderRunningHistory();
+
+                document.getElementById('runDistance').value = '';
+                document.getElementById('runDuration').value = '';
+                alert("Corrida salva!");
+            }
+
+            function renderRunningHistory() {
+                const tbody = document.querySelector('#runningTable tbody');
+                tbody.innerHTML = '';
+
+                const dates = Object.keys(state.history).sort().reverse();
+
+                dates.forEach(date => {
+                    const dayData = state.history[date];
+                    if (!dayData || !dayData.runs) return;
+
+                    [...dayData.runs].map((run, i) => ({ ...run, originalIndex: i })).reverse().forEach(run => {
+                        const pace = (run.duration / run.distance).toFixed(2);
+                        const [y, m, d] = date.split('-');
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${d}/${m} <span style="font-size:0.7em; color:#666">${run.time}</span></td>
+                            <td>${run.distance} km</td>
+                            <td>${run.duration} min</td>
+                            <td>
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    ${pace} min/km
+                                    <button onclick="zenith.deleteRunLog('${date}', ${run.originalIndex})" style="background:none; border:none; color:#666; cursor:pointer;">×</button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+            }
+
+            // --- CHART.JS ANALYTICS ---
+            let chartsInstance = {};
+
+            function renderAnalytics() {
+                const ctxSteps = document.getElementById('chartSteps');
+                const ctxWater = document.getElementById('chartWater');
+                const ctxRoutine = document.getElementById('chartRoutine');
+                const ctxRunning = document.getElementById('chartRunning');
+
+                // Prepare Data (Last 7 Days)
+                const labels = [];
+                const dataSteps = [];
+                const dataWater = [];
+                const dataRoutine = [];
+                const dataRunning = [];
+
+                const sortedDates = Object.keys(state.history).sort().slice(-7); // Last 7 chronologically
+
+                // Fill up to 7 days if history is short? Or just show what we have.
+                // Better to show what we have.
+
+                sortedDates.forEach(date => {
+                    const d = state.history[date];
+                    const [y, m, day] = date.split('-');
+                    labels.push(`${day}/${m}`);
+
+                    // Steps
+                    let steps = 0;
+                    if (d.logs) d.logs.forEach(l => steps += (l.steps || 0));
+                    else if (d.sleep) steps += (d.sleep.steps || 0);
+                    dataSteps.push(steps);
+
+                    // Water (Task Index 12)
+                    // Check if task 12 is in d.tasks
+                    const waterDone = (d.tasks || []).includes(12) ? 100 : 0; // 100% or 0%
+                    dataWater.push(waterDone);
+
+                    // Routine Completion %
+                    // Total tasks = ROUTINE_TEMPLATE.length (15)
+                    const completion = ((d.tasks || []).length / ROUTINE_TEMPLATE.length) * 100;
+                    dataRoutine.push(completion);
+
+                    // Running Distance
+                    let dist = 0;
+                    if (d.runs) d.runs.forEach(r => dist += (r.distance || 0));
+                    dataRunning.push(dist);
+                });
+
+                // Common Config
+                const commonOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, color: '#9ca3af', font: { family: 'Space Grotesk', size: 14 } }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#262626' },
+                            ticks: { color: '#525252', font: { family: 'Outfit' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#525252', font: { family: 'Outfit' } }
+                        }
+                    },
+                    animation: { duration: 1000, easing: 'easeOutQuart' }
+                };
+
+                // Helper to create/update chart
+                const createChart = (id, ctx, type, label, data, color, borderColor) => {
+                    if (chartsInstance[id]) chartsInstance[id].destroy();
+
+                    chartsInstance[id] = new Chart(ctx, {
+                        type: type,
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: label,
+                                data: data,
+                                backgroundColor: color,
+                                borderColor: borderColor,
+                                borderWidth: 2,
+                                borderRadius: 4,
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            ...commonOptions,
+                            plugins: {
+                                ...commonOptions.plugins,
+                                title: { ...commonOptions.plugins.title, text: label }
+                            }
+                        }
+                    });
+                };
+
+                // 1. Steps (Bar)
+                createChart('steps', ctxSteps, 'bar', 'Passos Diários', dataSteps, '#4ade80', '#4ade80');
+
+                // 2. Water (Bar - Consistency)
+                // Use a different color for Water? Blue #3b82f6
+                createChart('water', ctxWater, 'bar', 'Hidratação (3L)', dataWater, '#3b82f6', '#3b82f6');
+
+                // 3. Routine (Line)
+                const routineColor = 'rgba(245, 158, 11, 0.2)'; // Orange low opacity
+                const routineBorder = '#f59e0b';
+                createChart('routine', ctxRoutine, 'line', 'Rotina Completa (%)', dataRoutine, routineColor, routineBorder);
+
+                // 4. Running (Line)
+                const runColor = 'rgba(239, 68, 68, 0.2)'; // Red low
+                const runBorder = '#ef4444';
+                createChart('running', ctxRunning, 'line', 'Corrida (km)', dataRunning, runColor, runBorder);
+            }
+
+            async function hardReset() {
+                if (confirm("ATENÇÃO: Isso apagará TODO o histórico, incluindo passos e pontuação. Deseja continuar?")) {
+                    localStorage.removeItem(DB_KEY);
+                    try {
+                        await ZenithDB.clear();
+                        alert("Sistema resetado com sucesso!");
+                        location.reload();
+                    } catch (e) {
+                        console.error("Erro ao limpar banco de dados:", e);
+                        alert("Erro ao resetar. Tente novamente.");
+                    }
+                }
+            }
+
+            return { init, nav, saveSleepLog, saveRunningLog, deleteSleepLog, deleteRunLog, hardReset, updateGauge, updateMonthlySteps, loadDailyInputs, toggleGym };
+        })();
+
+        document.addEventListener('DOMContentLoaded', zenith.init);
+    </script>
+</body>
+
+</html>
